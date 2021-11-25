@@ -1,0 +1,141 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="{% static 'css/materialize.min.css' %}" media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="{% static 'css/style.css' %}" media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/materialize.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/chat.js' %}"></script>
+    <script
+      src="https://cdn.socket.io/4.1.2/socket.io.min.js"
+      integrity="sha384-toS6mmwu70G0fw54EGlWWeA4z3dyJ+dlXBtSURSKN4vyRFOcxd3Bzjj/AoOwY+Rg"
+      crossorigin="anonymous"
+    ></script>
+</head>
+
+<body>
+{% block body %}
+<ul>
+    <li><a href="">{{ request.user.username }}</a></li>
+    <li><a href="{% url 'logout' %}">Logout</a></li>
+</ul>
+
+<div class="section" style="height: 80vh">
+    <div class="row">
+        <div class="col s3">
+            <div class="card">
+                <div class="collection">
+                    {% for user in users %}
+                    <a href="{% url 'chatBox' request.user.id user.id %}" id="user{{ user.id }}"
+                       class="collection-item col">
+                        <div class="col s12">
+                            <span class="title" style="font-weight: bolder">{{ user.username }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                <a href="{% url 'chat_groups' %}">
+                    <button>Group Chats</button>
+                </a>
+            </div>
+        </div>
+        <div class="col s9">
+            <div class="card">
+
+                <div id="board" class="section red lighten-2" style="height: 68vh; padding: 5px; overflow-y: scroll">
+                    {% block messages %}
+
+                    {% endblock %}
+                </div>
+                <form id="chat-box" class="form-group {% block hide %}hide{% endblock %}" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+
+                        <script>
+        function isTyping() {
+                document.getElementById('typing_on').innerHTML = "User is typing...! "; }
+
+        function  notTyping (){
+       document.getElementById('typing_on').innerHTML = "No one is typing ! "; }
+
+                        </script>
+
+                        <div class="col s11">
+                            <div>
+                                <input onkeypress="setTimeout(isTyping(),4000); setInterval(notTyping,5000)"
+                                       id="id_message" name="message" type="text" placeholder="Write a message.">
+                            </div>
+                        </div>
+
+                        <!--<span id="typing_on">No one is typing -blank speace.</--span> --!>
+                        <div id="feedback"></div>
+                        <div class="col s1" style="line-height: 80px">
+                            <button class="btn btn-floating red lighten-2 waves-effect waves-light">Send</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% load staticfiles %}
+<script src="{% static 'js/chatBox.js' %}"></script>
+
+ <script>
+      const socket = io("http://localhost:4000");
+      let message = document.getElementById("id_message");
+      let feedback = document.getElementById("feedback");
+
+      message.addEventListener("keypress", () => {
+        socket.emit("typing", $(id_message).val());
+        console.log("se trimite");
+      });
+
+      socket.on("typing", (name) => {
+        feedback.innerHTML = '<p>user is typing...</p>';
+        setTimeout(() => {
+          feedback.innerHTML = "";
+        }, 3000);
+        console.log("se primeste");
+      });
+    </script>
+
+<script>
+     //Pentru primire
+     sender_id = "{{ receiver.id }}";
+     receiver_id = "{{ request.user.id }}";
+
+     //Pentru a trimite mesajul catre userul destinatie
+     $(function () {
+         scrolltoend();
+         $('#chat-box').on('submit', function (event) {
+         event.preventDefault();
+         var message = $('#id_message');
+         send('{{ request.user.username }}', '{{ receiver.username }}', message.val());
+         })
+     })
+
+     $('#id_message').onkeypress = function () {
+        var message = {{ request.user.username }} + " is typing";
+         localStorage.setItem("txtValue", message);
+     }
+
+
+
+
+
+</script>
+
+{% endblock %}
+</body>
+
+</html>

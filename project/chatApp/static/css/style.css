@@ -1,0 +1,35 @@
+/* label focus color */
+.input-field input[type=text]:focus + label {
+    color: #000; !important;
+}
+/* label underline focus color */
+.input-field input[type=text]:focus {
+    border-bottom: 1px solid #000; !important;
+    box-shadow: 0 1px 0 0 #000; !important;
+}
+
+.input-field input[type=password]:focus {
+    border-bottom: 1px solid #000; !important;
+    box-shadow: 0 1px 0 0 #000; !important;
+}
+.user-table {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.user-table td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.user-table tr:nth-child(even){background-color: #f2f2f2;}
+
+.user-table tr:hover {background-color: #ddd;}
+
+.user-table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;

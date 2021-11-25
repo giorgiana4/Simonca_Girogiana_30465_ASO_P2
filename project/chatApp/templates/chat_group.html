@@ -1,0 +1,85 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="{% static 'css/materialize.min.css' %}" media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="{% static 'css/style.css' %}" media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/materialize.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/chat.js' %}"></script>
+</head>
+
+<body>
+{% block body %}
+    <div class="section" style="height: 80vh">
+    <div class="row">
+        <div class="col s3">
+        <div class="card">
+            <div class="collection">
+                {% for group in groups %}
+                <a href="{% url 'chatBox' request.user.id group.id %}" id="group{{ group.id }}" class="collection-item row">
+                    <div class="col s8">
+                    <span class="title" style="font-weight: bolder">{{ group.name }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+               <a href="{% url 'create-group' %}">
+                    <button>Create group</button>
+                </a>
+        </div>
+        </div>
+        <div class="col s9">
+            <div class="card">
+            <div id="board" class="section red lighten-2" style="height: 68vh; padding: 5px; overflow-y: scroll">
+                {% block messages %}
+
+                {% endblock %}
+            </div>
+            <form id="chat-box" class="form-group {% block hide %}hide{% endblock %}" method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col s11">
+                        <div class="input-field">
+                            <input id="id_message" name="message" type="text" placeholder="Type your message..">
+                        </div>
+                    </div>
+                    <div class="col s1" style="line-height: 80px">
+                        <button class="btn btn-floating red lighten-2 waves-effect waves-light"><i class="material-icons">send</i></button>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+    </div>
+    {% load staticfiles %}
+    <script src="{% static 'chatBox.js' %}"></script>
+    <script>
+        // For receiving
+        sender_id = "{{ receiver.id }}";
+        receiver_id = "{{ request.user.id }}";
+
+        //For sending
+        $(function () {
+            scrolltoend();
+            $('#chat-box').on('submit', function (event) {
+                event.preventDefault();
+                var message = $('#id_message');
+                send('{{ request.user.username }}', '{{ receiver.username }}', message.val());
+                message.val('');
+            })
+        })
+    </script>
+{% endblock %}
+</body>
+
+</html>
